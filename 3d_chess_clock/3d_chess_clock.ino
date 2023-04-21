@@ -12,6 +12,8 @@ class Timer {
 
   public:
 
+  Timer(){}
+
   Timer(int mins, int seconds){
     this->mins = mins;
     this->seconds = seconds;
@@ -54,6 +56,33 @@ class Timer {
 
 class Player {
 
+  public:
+
+  Player(bool hasTurn, Timer timer){
+    this->hasTurn = hasTurn;
+    this->timer = timer;
+  }
+
+  bool getTurn(){
+    return hasTurn;
+  }
+
+  void setTurn(bool hasTurn){
+    this->hasTurn = hasTurn;
+  }
+
+  Timer getTimer(){
+    return timer;
+  }
+
+  void setTimer(Timer timer){
+    this->timer = timer;
+  }
+
+
+  private:
+  bool hasTurn;
+  Timer(15,00) timer;  
 
 }
 
