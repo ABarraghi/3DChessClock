@@ -5,6 +5,57 @@
 **/
 
 #include <LiquidCrystal.h>
+#include <string>
+using namespace std;
+
+class Timer {
+
+  public:
+
+  Timer(int mins, int seconds){
+    this->mins = mins;
+    this->seconds = seconds;
+    remainingTime = static_cast<long>((mins*60) + seconds);
+  }
+
+  int getMins(){
+    return mins;
+  }
+
+  void setMins(int mins){
+    this->mins = mins;
+  }
+
+  int getSeconds(){
+    return seconds;
+  }
+
+  void setSeconds(int seconds){
+    this->seconds = seconds;
+  }
+
+  long getRemainingTime(){
+    return remainingTime;
+  }
+
+  void setRemainingTime(long remainingTime){
+    this->remainingTime = remainingTime;
+  }
+
+  string toString(){
+    return to_string(mins) + ":" + to_string(seconds);
+  }
+
+  private:
+  int mins, seconds;
+  long remainingTime;
+
+}
+
+class Player {
+
+
+}
 
 
 //Setting up LED
