@@ -58,7 +58,16 @@ long Timer::getRemainingTime(){
 }
 
 String Timer::toString(){
- return String(mins) + ":" + String(seconds);  
+ String minString = " ";
+ String secString = " ";
+  
+ if(mins < 10) minString = "0" + String(mins);
+ else minString = String(mins);
+  
+ if(seconds < 10) secString = "0" + String(seconds);
+ else secString = String(seconds);
+   
+ return minString + ":" + secString;  
 }
 
 class Player {
@@ -150,7 +159,7 @@ void loop() {
   }
 
   if(currentMillis - buttonMillis > intervalButton && programState == 1) {
-    programState = 3; //Turn chess clock "on";
+    programState = 3; //Turn chess clock "on"
   }
   
   if(programState==3) { 
