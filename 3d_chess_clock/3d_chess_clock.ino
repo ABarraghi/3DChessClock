@@ -133,6 +133,8 @@ Player whitePlayer(false,timer);
 int timerMins = 0;
 int timerSeconds = 0;
 
+int switcher = 0;
+
 bool gameStarted = false;
 
 void setup() {
@@ -170,17 +172,40 @@ void loop() {
     lcd.setCursor(0,1);
     lcd.print(blackPlayer.getTimer().toString() + " | " + whitePlayer.getTimer().toString());
     whitePlayer.setTurn(true);
-    delay(1000);
+    lcd.print(blackPlayer.getTimer().toString() + " | " + whitePlayer.getTimer().toString()); 
+    switcher++;
+      
+  	if(switcher%2==0){
+    	blackPlayer.setTurn(true);
+    	whitePlayer.setTurn(false);
+  	}
+  	else{
+   		blackPlayer.setTurn(false);
+    	whitePlayer.setTurn(true);
+  	}
   }
+
   
     if(whitePlayer.getTurn() && whitePlayer.getTimer().getRemainingTime() > 0){ 
     Timer whiteTimer = whitePlayer.getTimer();
     if(whiteTimer.getSeconds() == 0){
-      whiteTimer.setSeconds(60);
+      whiteTimer.setSeconds(59);
       whiteTimer.setMins(whiteTimer.getMins()-1);      
     }
     else whiteTimer.setSeconds(whiteTimer.getSeconds()-1);
     whitePlayer.setTimer(whiteTimer);
+    delay(1000);
+  }
+  
+    if(blackPlayer.getTurn() && blackPlayer.getTimer().getRemainingTime() > 0){ 
+    Timer blackTimer = blackPlayer.getTimer();
+    if(blackTimer.getSeconds() == 0){
+      blackTimer.setSeconds(59);
+      blackTimer.setMins(blackTimer.getMins()-1);      
+    }
+    else blackTimer.setSeconds(blackTimer.getSeconds()-1);
+    blackPlayer.setTimer(blackTimer);
+    delay(1000);
   }
 
 }
