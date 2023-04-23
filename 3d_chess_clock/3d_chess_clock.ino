@@ -148,13 +148,14 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   unsigned long currentMillis = millis();
-  buttonState = digitalRead(whiteButtonPin);
+  whiteButtonState = digitalRead(whiteButtonPin);
+  blackButtonState = digitalRead(blackButtonPin);
 
-  if (buttonState == HIGH && programState == 0) {
+  if (whiteButtonState == HIGH && programState == 0) {
     buttonMillis = currentMillis;
     programState = 1;
   }
-  else if (programState == 1 && buttonState == LOW) {
+  else if (programState == 1 && whiteButtonState == LOW) {
         programState = 0; //reset
   }
 
@@ -168,6 +169,18 @@ void loop() {
     lcd.print("Black | White");
     lcd.setCursor(0,1);
     lcd.print(blackPlayer.getTimer().toString() + " | " + whitePlayer.getTimer().toString());
+    whitePlayer.setTurn(true);
+    delay(1000);
+  }
+  
+    if(whitePlayer.getTurn() && whitePlayer.getTimer().getRemainingTime() > 0){ 
+    Timer whiteTimer = whitePlayer.getTimer();
+    if(whiteTimer.getSeconds() == 0){
+      whiteTimer.setSeconds(60);
+      whiteTimer.setMins(whiteTimer.getMins()-1);      
+    }
+    else whiteTimer.setSeconds(whiteTimer.getSeconds()-1);
+    whitePlayer.setTimer(whiteTimer);
   }
 
 }
