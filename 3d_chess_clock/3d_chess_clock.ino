@@ -83,6 +83,8 @@ class Player {
   Timer getTimer();
 
   void setTimer(Timer timer);
+  
+  bool hasTime();
 
 
   private:
@@ -113,45 +115,45 @@ void Player::setTimer(Timer timer){
   this->timer = timer;
 }
 
+bool Player::hasTime(){
+  return timer.getRemainingTime() > 0;
+}
+
 //Setting up LCD
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs,en,d4,d5,d6,d7);
 
-//Setting up Buttons for the clock
-const int whiteButtonPin = 7;
-const int blackButtonPin = 8;
 
 int buttonState;
 int programState = 0;
 long buttonMillis = 0;
-const long intervalButton = 3000;  
+const long intervalButton = 1000;  
 
 //Setting up time controls
-Timer timer(15,0);
+Timer timer(15,0); 
 Player blackPlayer(false,timer);
 Player whitePlayer(false,timer);
-int timerMins = 0;
-int timerSeconds = 0;
-
-int switcher = 0;
-
 bool gameStarted = false;
 
 void setup() {
   // put your setup code here, to run once:
-  lcd.begin(16,2);
-  pinMode(whiteButtonPin, INPUT);      
-  digitalWrite(whiteButtonPin, HIGH);
-  pinMode(blackButtonPin, INPUT);      
-  digitalWrite(blackButtonPin, HIGH);
+  lcd.begin(16,2);    
   lcd.noDisplay();
+  
+  //Pushbutton inputs
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   unsigned long currentMillis = millis();
-  whiteButtonState = digitalRead(whiteButtonPin);
-  blackButtonState = digitalRead(blackButtonPin);
+  int whiteButtonState = digitalRead(A0);
+  int blackButtonState = digitalRead(A1);
+  
+  //Flag to check if both players still have time
+  bool playerTimeRemaining = blackPlayer.hasTime() && whitePlayer.hasTime();
 
   if (whiteButtonState == HIGH && programState == 0) {
     buttonMillis = currentMillis;
@@ -165,28 +167,42 @@ void loop() {
     programState = 3; //Turn chess clock "on"
   }
   
+  //Logic of the "on state"
   if(programState==3) { 
     lcd.display();
     lcd.setCursor(0,0);
     lcd.print("Black | White");
     lcd.setCursor(0,1);
     lcd.print(blackPlayer.getTimer().toString() + " | " + whitePlayer.getTimer().toString());
-    whitePlayer.setTurn(true);
-    lcd.print(blackPlayer.getTimer().toString() + " | " + whitePlayer.getTimer().toString()); 
-    switcher++;
-      
-  	if(switcher%2==0){
+    
+    //Swap turns to black
+    if((whiteButtonState == HIGH && gameStarted) && playerTimeRemaining){
     	blackPlayer.setTurn(true);
     	whitePlayer.setTurn(false);
   	}
-  	else{
+    
+    //Swap turns to white
+  	if(blackButtonState==HIGH && playerTimeRemaining){
    		blackPlayer.setTurn(false);
     	whitePlayer.setTurn(true);
+      	gameStarted = true;
   	}
-  }
+    
+    //Turn "off" chess clock, only when a player's time is out
+    if(blackButtonState==HIGH && !playerTimeRemaining){ //Turn chess clock off
+      lcd.noDisplay();
+      programState = 0;
+      blackPlayer.setTimer(timer);
+      whitePlayer.setTimer(timer);
+      blackPlayer.setTurn(false);
+      whitePlayer.setTurn(false);
+      gameStarted = false;
+    }
 
-  
-    if(whitePlayer.getTurn() && whitePlayer.getTimer().getRemainingTime() > 0){ 
+  }
+ 
+  //Countdown mechanisms for both players
+   if(whitePlayer.getTurn() && whitePlayer.getTimer().getRemainingTime() > 0){ 
     Timer whiteTimer = whitePlayer.getTimer();
     if(whiteTimer.getSeconds() == 0){
       whiteTimer.setSeconds(59);
